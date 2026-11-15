@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Гроздо, срећан рођендан! ❤️</title>
+
+<style>
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  overflow: hidden;
+  background: linear-gradient(135deg, #ffb6d9, #ffcce6, #ffe0f0);
+  font-family: 'Arial', sans-serif;
+  text-align: center;
+}
+
+/* Почетни екран */
+#start-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #ffadd6, #ffd6eb);
+  transition: opacity 0.6s ease;
+}
+
+#start-button {
+  border: none;
+  border-radius: 50px;
+  padding: 20px 36px;
+  font-size: 22px;
+  font-weight: bold;
+  color: white;
+  background: linear-gradient(45deg, #ff4f9a, #ff83b9);
+  box-shadow: 0 8px 25px rgba(217, 76, 139, 0.4);
+  cursor: pointer;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  50% { transform: scale(1.08); }
+}
+
+/* Водени жиг преко целог екрана на крају */
+#watermark {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: 'Brush Script MT', 'Lucida Handwriting', 'Segoe Script', cursive, sans-serif;
+  font-size: clamp(80px, 22vw, 180px);
+  color: rgba(72, 202, 228, 0.22); /* Плава боја са провидношћу */
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0;
+  transform: scale(0.7);
+  transition: opacity 1s ease, transform 1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  user-select: none;
+}
+
+#watermark.show {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Главна сцена центрирана на средини екрана */
+#stage {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 6;
+  pointer-events: none;
+}
+
+/* Oблачић са почетном поруком */
+#lion-speech {
+  opacity: 0;
+  transform: translateY(-20px) scale(0.8);
+  max-width: 90vw;
+  padding: 15px 28px;
+  margin-bottom: 25px;
+  border-radius: 30px;
+  background: white;
+  color: #d41470;
+  font-size: clamp(18px, 4vw, 30px);
+  font-weight: bold;
+  box-shadow: 0 8px 25px rgba(168, 50, 107, 0.25);
+  transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+#lion-speech.show {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+/* Први прозор (Жели ти Владан) */
+#popup-window {
+  position: fixed;
+  top: 14%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.5);
+  opacity: 0;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border: 3px solid #ff4f9a;
+  border-radius: 25px;
+  padding: 15px 30px;
+  color: #d41470;
+  font-size: clamp(18px, 4vw, 28px);
+  font-weight: bold;
+  box-shadow: 0 15px 35px rgba(212, 20, 112, 0.35);
+  z-index: 25;
+  transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  pointer-events: none;
+}
+
+#popup-window.show {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+/* Плаво-црна варијанта за други текст */
+#popup-window.blue-black {
+  background: linear-gradient(135deg, #0b132b, #1c2541);
+  border: 3px solid #48cae4;
+  color: #90e0ef;
+  box-shadow: 0 15px 35px rgba(0, 180, 216, 0.4);
+}
+
+/* Четврти прозор (Уживај) - розе стил */
+#popup-window-2 {
+  position: fixed;
+  top: 26%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.5);
+  opacity: 0;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border: 3px solid #ff4f9a;
+  border-radius: 25px;
+  padding: 15px 30px;
+  color: #d41470;
+  font-size: clamp(18px, 4vw, 28px);
+  font-weight: bold;
+  box-shadow: 0 15px 35px rgba(212, 20, 112, 0.35);
+  z-index: 26;
+  transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  pointer-events: none;
+}
+
+#popup-window-2.show {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+/* Главни актери (лавић и торта) један поред другог */
+#actors {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 30px;
+  margin-top: 30px;
+}
+
+/* Стари лавић - енергичан улазак па плес */
+#lion {
+  font-size: clamp(90px, 22vw, 150px);
+  opacity: 0;
+  transform: translateY(180px) scale(0.2) rotate(-30deg);
+  filter: drop-shadow(0 10px 15px rgba(0,0,0,0.15));
+}
+
+#lion.show {
+  animation: lionEntrance 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards, 
+             lionDance 1.2s ease-in-out 1.2s infinite alternate;
+}
+
+@keyframes lionEntrance {
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1) rotate(0deg);
+  }
+}
+
+@keyframes lionDance {
+  0% { transform: translateY(0) rotate(0deg) scale(1); }
+  50% { transform: translateY(-15px) rotate(-6deg) scale(1.05); }
+  100% { transform: translateY(0) rotate(6deg) scale(1); }
+}
+
+/* Торта - долази пар секунди касније са сопственим скоком */
+#cake {
+  font-size: clamp(80px, 18vw, 130px);
+  opacity: 0;
+  transform: translateY(180px) scale(0.2) rotate(40deg);
+  filter: drop-shadow(0 10px 15px rgba(0,0,0,0.15));
+}
+
+#cake.show {
+  animation: cakeEntrance 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards, 
+             cakeDance 1s ease-in-out 1.2s infinite alternate;
+}
+
+@keyframes cakeEntrance {
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1) rotate(0deg);
+  }
+}
+
+@keyframes cakeDance {
+  0% { transform: translateY(0) scale(1); }
+  100% { transform: translateY(-12px) scale(1.08); }
+}
+
+/* Лебдећи балони и поклони */
+.balloon {
+  position: absolute;
+  bottom: -130px;
+  font-size: 45px;
+  animation: floatUp linear forwards;
+  z-index: 2;
+  user-select: none;
+}
+
+@keyframes floatUp {
+  to { transform: translateY(-120vh) rotate(20deg); }
+}
+
+canvas {
+  position: fixed;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+}
+</style>
+</head>
+
+<body>
+
+<div id="start-screen">
+  <button id="start-button">🚀 POKRENI AVANTURU!</button>
+</div>
+
+<canvas id="fireworks"></canvas>
+
+<!-- Водени жиг преко целог екрана -->
+<div id="watermark">Живели</div>
+
+<div id="stage">
+  <div id="lion-speech">Гроздо, срећан рођендан! ❤️</div>
+
+  <!-- Прозори за честитке -->
+  <div id="popup-window">Жели ти Владан</div>
+  <div id="popup-window-2">Уживај ✨</div>
+
+  <div id="actors">
+    <div id="lion">🦁</div>
+    <div id="cake">🎂</div>
+  </div>
+</div>
+
+<script>
+const startScreen = document.getElementById("start-screen");
+const startButton = document.getElementById("start-button");
+const lion = document.getElementById("lion");
+const cake = document.getElementById("cake");
+const speech = document.getElementById("lion-speech");
+const popupWindow = document.getElementById("popup-window");
+const popupWindow2 = document.getElementById("popup-window-2");
+const watermark = document.getElementById("watermark");
+const canvas = document.getElementById("fireworks");
+const ctx = canvas.getContext("2d");
+
+let audioCtx;
+let particles = [];
+
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+window.addEventListener("resize", resizeCanvas);
+resizeCanvas();
+
+// Гласнији и пунији звук
+function tone(freq, duration, volume = 0.22) {
+  if (!audioCtx) return;
+
+  const now = audioCtx.currentTime;
+  const osc1 = audioCtx.createOscillator();
+  const osc2 = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+
+  osc1.type = "triangle";
+  osc2.type = "sine";
+  
+  osc1.frequency.setValueAtTime(freq, now);
+  osc2.frequency.setValueAtTime(freq * 2, now);
+
+  const osc2Gain = audioCtx.createGain();
+  osc2Gain.gain.value = 0.3;
+
+  gain.gain.setValueAtTime(0.001, now);
+  gain.gain.linearRampToValueAtTime(volume, now + 0.04);
+  gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+
+  osc1.connect(gain);
+  osc2.connect(osc2Gain);
+  osc2Gain.connect(gain);
+  gain.connect(audioCtx.destination);
+
+  osc1.start(now);
+  osc2.start(now);
+  osc1.stop(now + duration);
+  osc2.stop(now + duration);
+}
+
+// "Happy Birthday" мелодија која се врти у круг (loop)
+function playMusic() {
+  const song = [
+    { f: 392, d: 320 }, { f: 392, d: 320 }, { f: 440, d: 640 }, { f: 392, d: 640 }, { f: 523, d: 640 }, { f: 494, d: 1200 },
+    { f: 392, d: 320 }, { f: 392, d: 320 }, { f: 440, d: 640 }, { f: 392, d: 640 }, { f: 587, d: 640 }, { f: 523, d: 1200 },
+    { f: 392, d: 320 }, { f: 392, d: 320 }, { f: 784, d: 640 }, { f: 659, d: 640 }, { f: 523, d: 640 }, { f: 494, d: 640 }, { f: 440, d: 1200 },
+    { f: 698, d: 320 }, { f: 698, d: 320 }, { f: 659, d: 640 }, { f: 523, d: 640 }, { f: 587, d: 640 }, { f: 523, d: 1300 }
+  ];
+
+  let index = 0;
+
+  function playNextNote() {
+    if (!audioCtx) return;
+    const note = song[index];
+    tone(note.f, (note.d / 1000) * 0.9, 0.22);
+    
+    index++;
+    if (index >= song.length) {
+      index = 0;
+    }
+    setTimeout(playNextNote, note.d * 1.15);
+  }
+
+  playNextNote();
+}
+
+// Zvuk vatrometa
+function fireworkSound() {
+  if (!audioCtx) return;
+
+  const bufferSize = audioCtx.sampleRate * 0.5;
+  const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+  const data = buffer.getChannelData(0);
+
+  for (let i = 0; i < bufferSize; i++) {
+    data[i] = (Math.random() * 2 - 1) * (1 - i / bufferSize);
+  }
+
+  const noise = audioCtx.createBufferSource();
+  const gain = audioCtx.createGain();
+
+  noise.buffer = buffer;
+  gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.5);
+
+  noise.connect(gain);
+  gain.connect(audioCtx.destination);
+  noise.start();
+}
+
+// Baloni i pokloni
+function createBalloon() {
+  const icons = ["🎈", "💖", "🎉", "🎂", "✨", "🎁"];
+  const balloon = document.createElement("div");
+  balloon.className = "balloon";
+  balloon.textContent = icons[Math.floor(Math.random() * icons.length)];
+  balloon.style.left = Math.random() * 90 + "vw";
+  balloon.style.animationDuration = (4 + Math.random() * 4) + "s";
+  document.body.appendChild(balloon);
+
+  setTimeout(() => balloon.remove(), 8000);
+}
+
+// Vatromet
+function createFirework() {
+  const x = Math.random() * canvas.width;
+  const y = Math.random() * (canvas.height * 0.5);
+  const colors = ["#ff1493", "#ff8c00", "#ffd700", "#00ced1", "#adff2f", "#ff4500", "#ff69b4"];
+  const color = colors[Math.floor(Math.random() * colors.length)];
+
+  fireworkSound();
+
+  for (let i = 0; i < 45; i++) {
+    const angle = (Math.PI * 2 * i) / 45;
+    const speed = 2 + Math.random() * 4;
+    particles.push({
+      x,
+      y,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed,
+      alpha: 1,
+      color
+    });
+  }
+}
+
+function animateFireworks() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  for (let i = particles.length - 1; i >= 0; i--) {
+    const p = particles[i];
+    p.x += p.vx;
+    p.y += p.vy;
+    p.vy += 0.05;
+    p.alpha -= 0.015;
+
+    if (p.alpha <= 0) {
+      particles.splice(i, 1);
+      continue;
+    }
+
+    ctx.save();
+    ctx.globalAlpha = p.alpha;
+    ctx.fillStyle = p.color;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, 4, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  requestAnimationFrame(animateFireworks);
+}
+
+// Klik na dugme - pokreće sve
+startButton.addEventListener("click", () => {
+  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  playMusic();
+
+  startScreen.style.opacity = "0";
+  setTimeout(() => {
+    startScreen.style.display = "none";
+  }, 600);
+
+  // 1. Улазак лавића на средину
+  setTimeout(() => {
+    lion.classList.add("show");
+  }, 200);
+
+  // 2. Порука изнад њих
+  setTimeout(() => {
+    speech.classList.add("show");
+  }, 1000);
+
+  // 3. Торта долази неколико секунди касније
+  setTimeout(() => {
+    cake.classList.add("show");
+  }, 2200);
+
+  // 4. Након 3 секунде - отвара се први прозор са "Жели ти Владан"
+  setTimeout(() => {
+    popupWindow.classList.add("show");
+  }, 3000);
+
+  // 5. Након још 2 секунде (укупно 5 секунди) - прозор мења текст и прелази у плаво-црну варијанту
+  setTimeout(() => {
+    popupWindow.textContent = "Да ти се све жеље испуне ✨";
+    popupWindow.classList.add("blue-black");
+  }, 5000);
+
+  // 6. Након још 2 секунде (укупно 7 секунди) - појављује се четврти розе прозор "Уживај"
+  setTimeout(() => {
+    popupWindow2.classList.add("show");
+  }, 7000);
+
+  // 7. Након још 2 секунде (укупно 9 секунди) - појављује се плави водени жиг "Живели" преко целог екрана
+  setTimeout(() => {
+    watermark.classList.add("show");
+  }, 9000);
+
+  setInterval(createBalloon, 600);
+  setInterval(createFirework, 1400);
+  createFirework();
+  animateFireworks();
+});
+</script>
+
+</body>
+</html>
